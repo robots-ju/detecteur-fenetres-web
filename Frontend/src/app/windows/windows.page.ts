@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { WindowsService } from './windows.service';
+import { Window } from './window.model';
+
 
 @Component({
   selector: 'app-windows',
@@ -7,9 +10,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WindowsPage implements OnInit {
 
-  constructor() { }
+  windowsList: Window[];
+
+  constructor(private windowsService: WindowsService) { }
 
   ngOnInit() {
+    this.refresh();
+  }
+
+  refresh() {
+    this.windowsService.getWindowsList().subscribe((data: Window[]) => {
+      this.windowsList = data;
+      console.log(data);
+    });
   }
 
 }

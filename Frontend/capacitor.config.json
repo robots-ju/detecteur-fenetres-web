@@ -1,0 +1,7 @@
+{
+  "appId": "com.robotsju.wewindow",
+  "appName": "Frontend",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www"
+}
