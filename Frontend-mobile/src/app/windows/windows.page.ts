@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WindowsService } from './windows.service';
 import { Window } from './window.model';
+import io from 'socket.io-client';
 
 
 @Component({
@@ -11,12 +12,18 @@ import { Window } from './window.model';
 export class WindowsPage implements OnInit {
 
   windowsList: Window[];
+  socket;
+
 
   constructor(private windowsService: WindowsService) { }
 
   ngOnInit() {
-    this.refresh();
+    this.socket = io('http://192.168.2.98:8081');
+    this.socket.on('windows', (data) => {
+      this.windowsList = data;
+    });
   }
+
 
   refresh() {
     this.windowsService.getWindowsList().subscribe((data: Window[]) => {

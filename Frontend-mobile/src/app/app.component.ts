@@ -29,13 +29,13 @@ export class AppComponent {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
 
-      if (this.platform.is('cordova' || 'capacitor')) {
-        this.setup();
+      if (this.platform.is('capacitor' || 'cordova')) {
+        this.setupPush();
       }
     });
   }
 
-  setup() {
+  setupPush() {
     this.oneSignal.startInit('55a5ef9d-30fa-4f8d-b7f1-667e715eb9fb', '359022967458');
 
     this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
