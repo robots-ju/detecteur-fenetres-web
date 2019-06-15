@@ -5,7 +5,7 @@ Détecteur de portes et fenêtres, partie web
 1. Se rendre dans le dossier: `app-web`
 2. Entrer la commande: `npm i`
 3. Puis entrer la commande `npm run serve`
-4. Se rendre à l'addresse suivant sur un navigateur internet: `localhost:8080`
+4. Se rendre à l'adresse suivant sur un navigateur internet: `localhost:8080`
 
 ## Command démarer le server NodeJS
 1. Se rendre dans le dossier: `Backend`
