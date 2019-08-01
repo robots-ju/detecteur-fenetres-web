@@ -1,8 +1,0 @@
-{
-  "name": "Wewindow",
-  "integrations": {
-    "cordova": {},
-    "capacitor": {}
-  },
-  "type": "angular"
-}

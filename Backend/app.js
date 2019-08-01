@@ -1,27 +1,36 @@
-const express = require("express");
-const morgan = require("morgan");
-const bodyParser = require("body-parser");
+const express = require('express');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const app = express();
-const config = require("./config");
-const OneSignal = require("onesignal-node");
-const io = require("socket.io");
+const config = require('./config');
+const OneSignal = require('onesignal-node');
+const io = require('socket.io');
 const server = require('http').createServer();
 
 let WindowsRouter = express.Router();
 
 let windows = [];
 
-app.use(morgan("dev"));
+let socket = io(server);
+server.listen(8081);
+
+socket.on('connect', () => {
+  console.log('Connect');
+  socket.emit('windows', windows);
+});
+
+app.use(morgan('dev'));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
-WindowsRouter.route("/")
+WindowsRouter.route('/')
   .get((req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Origin', '*');
     res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept'
     );
+    socket.emit('windows', windows);
     res.json(succes(windows));
   })
   .post((req, res) => {
@@ -42,7 +51,7 @@ WindowsRouter.route("/")
         windows[index].name = req.body.name;
         windows[index].state = req.body.state;
       }
-      if (windows[index].state === "opened") {
+      if (windows[index].state === 'opened') {
         if (!windows[index].openedDate) {
           windows[index].openedDate = new Date();
           windows[index].openedNumber++;
@@ -58,20 +67,17 @@ WindowsRouter.route("/")
         notifification(windows[index]);
       }
       socket.emit('windows', windows);
-      res.json(succes("Succesful"));
+      res.json(succes('Succesful'));
     }
   });
-app.use(config.rootApi + "windows", WindowsRouter);
+app.use(config.rootApi + 'windows', WindowsRouter);
 app.listen(config.port, () =>
   console.log(
-    "Server ready on the port: ",
-    config.port + " Root API: ",
+    'Server ready on the port: ',
+    config.port + ' Root API: ',
     config.rootApi
   )
 );
-
-let socket = io(server);
-server.listen(8081);   
 
 function succes(result) {
   return result;
@@ -79,16 +85,16 @@ function succes(result) {
 
 function error(message) {
   return {
-    status: "error",
+    status: 'error',
     message: message
   };
 }
 
 var myClient = new OneSignal.Client({
-  userAuthKey: "YTBhYWJhNTktNjRjNC00NDRlLTk5MGMtYjVjNmVhY2E1MTM3",
+  userAuthKey: 'YTBhYWJhNTktNjRjNC00NDRlLTk5MGMtYjVjNmVhY2E1MTM3',
   app: {
-    appAuthKey: "YzkxM2EwOTQtYTQ1Yy00NDY3LWI0MzQtY2UyM2I5NGZmYzdi",
-    appId: "55a5ef9d-30fa-4f8d-b7f1-667e715eb9fb"
+    appAuthKey: 'YzkxM2EwOTQtYTQ1Yy00NDY3LWI0MzQtY2UyM2I5NGZmYzdi',
+    appId: '55a5ef9d-30fa-4f8d-b7f1-667e715eb9fb'
   }
 });
 
@@ -102,14 +108,14 @@ function notifification(window) {
       },
       contents: {
         en:
-          "Is " +
+          'Is ' +
           window.state +
-          " since: " +
+          ' since: ' +
           window.openedTime[0] +
-          "h" +
+          'h' +
           window.openedTime[1] +
-          "m" +
-          " !"
+          'm' +
+          ' !'
       }
     });
   } else if (window.openedTime) {
@@ -118,7 +124,7 @@ function notifification(window) {
         en: window.name
       },
       contents: {
-        en: "is " + window.state + " since: " + window.openedTime + " !"
+        en: 'is ' + window.state + ' since: ' + window.openedTime + ' !'
       }
     });
   } else {
@@ -127,23 +133,23 @@ function notifification(window) {
         en: window.name
       },
       contents: {
-        en: "is closed !"
+        en: 'is closed !'
       }
     });
   }
 
   // set target users
-  notification.postBody["included_segments"] = ["Active Users"];
-  notification.postBody["excluded_segments"] = ["Banned Users"];
+  notification.postBody['included_segments'] = ['Active Users'];
+  notification.postBody['excluded_segments'] = ['Banned Users'];
 
   // set notification parameters
-  notification.postBody["data"] = { abc: "123", foo: "bar" };
-  notification.postBody["send_after"] = new Date();
+  notification.postBody['data'] = { abc: '123', foo: 'bar' };
+  notification.postBody['send_after'] = new Date();
 
   // send this notification to All Users except Inactive ones
   myClient.sendNotification(notification, function(err, httpResponse, data) {
     if (err) {
-      console.log("Something went wrong...");
+      console.log('Something went wrong...');
     } else {
       console.log(data, httpResponse.statusCode);
     }
@@ -155,7 +161,7 @@ function convertDate(duration) {
   let m = Math.floor((hDecimal * 60) % 60);
   let h = Math.floor(hDecimal);
   if (m === 0) {
-    return "now";
+    return 'now';
   } else {
     return [h, m];
   }
